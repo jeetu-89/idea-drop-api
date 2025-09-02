@@ -111,5 +111,55 @@ router.delete(
   }
 );
 //-----------------------------------------------------------------------------------------------------------------
+//routes               Update /api/ideas/:id
+//description          Update single idea by its id
+//access               Private
+router.put(
+  "/:id",
+  async (
+    req: Request<{ id: string }, {}, IdeaBody>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const { id } = req.params;
+    const { title, description, summary, tags } = req.body;
+    try {
+      if (!id) {
+        res.status(400);
+        throw new Error("You forgot to provide ideaId");
+      }
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        res.status(400);
+        throw new Error("Invalid idea id has provided.");
+      }
+      if (!title.trim() || !description.trim() || !summary.trim()) {
+        res.status(400);
+        throw new Error("Title, Description, and Summary are needed");
+      }
 
+      const newIdea = {
+        title,
+        description,
+        summary,
+        tags:
+          typeof tags === "string"
+            ? tags
+                .split(",")
+                .map((tag) => tag.trim())
+                .filter(Boolean)
+            : Array.isArray(tags)
+            ? tags
+            : [],
+      };
+      const savedIdea = await Idea.findByIdAndUpdate(id, newIdea);
+      if (!savedIdea) {
+        res.status(404);
+        throw new Error("Idea not Found");
+      }
+      res.status(201).json(savedIdea);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 export default router;
