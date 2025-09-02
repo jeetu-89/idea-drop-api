@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import errorHandler from "./middleware/errorHandler.js";
 import notFound from "./middleware/notFound.js";
 import connectDB from "./config/db.js";
+import ideaRouter from "./routes/idea.js";
 
 dotenv.config();
 const app = express();
@@ -13,6 +14,10 @@ connectDB();
 
 //Middleware
 app.use(cors());
+
+
+//Endpoints
+app.use("/api/ideas", ideaRouter);
 
 //NotFound
 app.use("/", notFound);
