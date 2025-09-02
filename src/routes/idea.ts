@@ -79,5 +79,37 @@ router.post(
   }
 );
 
+//-----------------------------------------------------------------------------------------------------------------
+//routes               DELETE /api/ideas/:id
+//description          Delete single idea by its id
+//access               Private
+router.delete(
+  "/:id",
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+      if (!id) {
+        res.status(400);
+        throw new Error("You forgot to provide ideaId");
+      }
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        res.status(400);
+        throw new Error("Invalid idea id has provided.");
+      }
+      const idea = await Idea.findByIdAndDelete(id);
+
+      if (!idea) {
+        res.status(404);
+        throw new Error("Idea not Found");
+      }
+      res.json({
+        message: "Idea deleted successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+//-----------------------------------------------------------------------------------------------------------------
 
 export default router;
