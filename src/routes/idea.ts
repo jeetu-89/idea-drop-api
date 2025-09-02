@@ -2,6 +2,7 @@ import express from "express";
 import type { Response, Request, NextFunction } from "express";
 import mongoose from "mongoose";
 import Idea from "../models/Idea.js";
+import type { IdeaBody } from "../types.js";
 
 const router = express();
 
@@ -39,4 +40,44 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
     next(err);
   }
 });
+
+//-----------------------------------------------------------------------------------------------
+//route               POST /api/ideas
+//description         Post single idea
+//access              Private
+router.post(
+  "/",
+  async (req: Request<{}, {}, IdeaBody>, res: Response, next: NextFunction) => {
+    const { title, summary, description, tags } = req.body;
+
+    try {
+      if (!title.trim() || !summary.trim() || !description.trim()) {
+        res.status(400);
+        throw new Error("Insufficent body content passed");
+      }
+      const newIdea = {
+        title,
+        summary,
+        description,
+        tags:
+          typeof tags === "string"
+            ? tags
+                .split(",")
+                .map((tag) => tag.trim())
+                .filter(Boolean)
+            : Array.isArray(tags)
+            ? tags
+            : [],
+      };
+
+      const savedIdea = await Idea.create(newIdea);
+      res.status(201).json(savedIdea);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  }
+);
+
+
 export default router;

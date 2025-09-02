@@ -14,7 +14,8 @@ connectDB();
 
 //Middleware
 app.use(cors());
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 //Endpoints
 app.use("/api/ideas", ideaRouter);
