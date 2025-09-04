@@ -4,7 +4,8 @@ import dotenv from "dotenv";
 import errorHandler from "./middleware/errorHandler.js";
 import notFound from "./middleware/notFound.js";
 import connectDB from "./config/db.js";
-import ideaRouter from "./routes/idea.js";
+import ideaRouter from "./routes/ideaRoutes.js";
+import authRouter from "./routes/authRoutes.js"
 
 dotenv.config();
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //Endpoints
 app.use("/api/ideas", ideaRouter);
+app.use("/api/auth", authRouter);
 
 //NotFound
 app.use("/", notFound);

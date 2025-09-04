@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
-import type { User } from "../types.js";
+import type { UserType } from "../types.js";
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -29,7 +29,7 @@ userSchema.pre("save", async function (next) {
   if (!this.isNew) {
     if (!this.isModified("password")) return next();
 
-    const currentUser: User | null = await mongoose
+    const currentUser: UserType | null = await mongoose
       .model("User")
       .findById(this._id);
     const isSame =

@@ -7,9 +7,9 @@ import type { IdeaBody } from "../types.js";
 const router = express();
 
 //---------------------------------------------------------------------------------------------------------
-//route               GET /api/ideas
-//description         Get all ideas
-//access              Public
+//@route               GET /api/ideas
+//@description         Get all ideas
+//@access              Public
 //@query              _limit(optional limit for ideas returned)
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   const limit = parseInt(
@@ -28,9 +28,9 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 //--------------------------------------------------------------------------------------------------------------
-//route               GET /api/ideas/:id
-//description         Get single idea
-//access              Public
+//@route               GET /api/ideas/:id
+//@description         Get single idea
+//@access              Public
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   try {
@@ -50,9 +50,9 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 //-----------------------------------------------------------------------------------------------
-//route               POST /api/ideas
-//description         Post single idea
-//access              Private
+//@route               POST /api/ideas
+//@description         Post single idea
+//@access              Private
 router.post(
   "/",
   async (req: Request<{}, {}, IdeaBody>, res: Response, next: NextFunction) => {
@@ -88,9 +88,9 @@ router.post(
 );
 
 //-----------------------------------------------------------------------------------------------------------------
-//routes               DELETE /api/ideas/:id
-//description          Delete single idea by its id
-//access               Private
+//@routes               DELETE /api/ideas/:id
+//@description          Delete single idea by its id
+//@access               Private
 router.delete(
   "/:id",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -119,9 +119,9 @@ router.delete(
   }
 );
 //-----------------------------------------------------------------------------------------------------------------
-//routes               Update /api/ideas/:id
-//description          Update single idea by its id
-//access               Private
+//@routes               Update /api/ideas/:id
+//@description          Update single idea by its id
+//@access               Private
 router.put(
   "/:id",
   async (

@@ -7,7 +7,7 @@ export type IdeaBody = {
   tags: string | string[];
 };
 
-export type User = {
+export type UserType = {
   _id: mongoose.Types.ObjectId;
   name: string;
   email: string;

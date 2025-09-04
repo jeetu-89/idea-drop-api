@@ -1,5 +1,4 @@
 import mongoose, { model } from "mongoose";
-import { title } from "process";
 
 const ideaSchema = new mongoose.Schema(
   {
