@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
+import type { IUser } from "../types.js";
 
 import express from "express";
 import User from "../models/User.js";
@@ -68,12 +69,63 @@ router.post(
     res.clearCookie("refreshToken", {
       httpOnly: true,
       sameSite: "none",
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
     });
     res.status(200).json({
-      message: "Logged out successfully"
-    })
+      message: "Logged out successfully",
+    });
   }
 );
 
+//--------------------------------------------------------------------------------------------------------------------------------------
+//@route               POST /api/auth/login
+//@description         Authenticate a user
+//@access              Public
+router.post(
+  "/login",
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password } = req.body;
+    try {
+      if(!email.trim() || !password.trim()){
+        res.status(400);
+        throw new Error("Email and Password are required.")
+      }
+      const existingUser = await User.findOne({ email: email.trim() }) as IUser|null;
+      if (!existingUser) {
+        res.status(401);
+        throw new Error("Invalid email or password.");
+      }
+      const isSame = await existingUser.matchPassword(password);
+      if (!isSame) {
+        res.status(401);
+        throw new Error("Invalid email or password.");
+      }
+
+      //Token generation
+      const payload = { userId: existingUser._id.toString() };
+      const accessToken = await generateToken(payload, "1m");
+      const refreshToken = await generateToken(payload, "30d");
+
+      //set Cookie
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 30 * 24 * 60 * 60 * 1000, //30days,
+        sameSite: "none",
+        secure: process.env.NODE_ENV === "production",
+      });
+
+      res.status(200).json({
+        accessToken,
+        user: {
+          userId: existingUser._id,
+          name: existingUser.name,
+          email,
+
+        }
+      })
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 export default router;

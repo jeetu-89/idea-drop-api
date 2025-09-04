@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 export type IdeaBody = {
   title: string;
@@ -8,8 +8,16 @@ export type IdeaBody = {
 };
 
 export type UserType = {
-  _id: mongoose.Types.ObjectId;
+  _id: mongoose.Schema.Types.ObjectId;
   name: string;
   email: string;
   password: string;
 };
+
+export interface IUser extends mongoose.Document{
+  name: string,
+  email: string,
+  password: string,
+  _id: mongoose.Schema.Types.ObjectId
+  matchPassword: (enteredPass: string)=> Promise<boolean>
+}
