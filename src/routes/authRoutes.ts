@@ -3,13 +3,13 @@ import type { Request, Response, NextFunction } from "express";
 import express from "express";
 import User from "../models/User.js";
 import generateToken from "../lib/generateToken.js";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 
 dotenv.config();
 const router = express.Router();
 
 //--------------------------------------------------------------------------------------------------------------------------------------
-//@route               POST /api/auth
+//@route               POST /api/auth/register
 //@description         Register user details
 //@access              Public
 router.post(
@@ -34,7 +34,7 @@ router.post(
 
       //Token generation
       const payload = { userId: user._id.toString() };
-      const refreshToken =await generateToken(payload, "30d");
+      const refreshToken = await generateToken(payload, "30d");
       const accessToken = await generateToken(payload, "1m");
 
       //Setting up cookies
@@ -42,7 +42,7 @@ router.post(
         httpOnly: true,
         maxAge: 30 * 24 * 60 * 60 * 1000, //30days
         sameSite: "none",
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === "production",
       });
 
       res.status(201).json({
@@ -58,4 +58,22 @@ router.post(
     }
   }
 );
+//--------------------------------------------------------------------------------------------------------------------------------------
+//@route               POST /api/auth/logout
+//@description         Logout user and delete  refreshToken
+//@access              Private
+router.post(
+  "/logout",
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: process.env.NODE_ENV === 'production',
+    });
+    res.status(200).json({
+      message: "Logged out successfully"
+    })
+  }
+);
+
 export default router;
