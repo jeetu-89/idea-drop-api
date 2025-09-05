@@ -18,9 +18,9 @@ const router = express.Router();
 router.post(
   "/register",
   async (req: Request, res: Response, next: NextFunction) => {
-    const { name, email, password } = req.body;
     try {
-      if (!name.trim() || !email.trim() || !password.trim()) {
+      const { name, email, password } = req.body || {};
+      if (!name?.trim() || !email?.trim() || !password) {
         res.status(400);
         throw new Error("All fields are required.");
       }
@@ -61,6 +61,7 @@ router.post(
     }
   }
 );
+
 //--------------------------------------------------------------------------------------------------------------------------------------
 //@route               POST /api/auth/logout
 //@description         Logout user and delete  refreshToken
@@ -86,9 +87,9 @@ router.post(
 router.post(
   "/login",
   async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
     try {
-      if (!email.trim() || !password.trim()) {
+      const { email, password } = req.body || {};
+      if (!email?.trim() || !password) {
         res.status(400);
         throw new Error("Email and Password are required.");
       }
@@ -129,6 +130,7 @@ router.post(
     }
   }
 );
+
 //--------------------------------------------------------------------------------------------------------------------------------------
 //@route               POST /api/auth/refresh
 //@description         Generate new access token
@@ -167,4 +169,5 @@ router.post(
     }
   }
 );
+
 export default router;

@@ -56,9 +56,9 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 router.post(
   "/",
   async (req: Request<{}, {}, IdeaBody>, res: Response, next: NextFunction) => {
-    const { title, summary, description, tags } = req.body;
-
+    
     try {
+      const { title, summary, description, tags } = req.body || {};
       if (!title.trim() || !summary.trim() || !description.trim()) {
         res.status(400);
         throw new Error("Insufficent body content passed");
@@ -130,8 +130,8 @@ router.put(
     next: NextFunction
   ) => {
     const { id } = req.params;
-    const { title, description, summary, tags } = req.body;
     try {
+      const { title, description, summary, tags } = req.body || {};
       if (!id) {
         res.status(400);
         throw new Error("You forgot to provide ideaId");
