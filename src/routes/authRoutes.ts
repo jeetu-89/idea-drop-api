@@ -1,10 +1,12 @@
 import type { Request, Response, NextFunction } from "express";
-import type { IUser } from "../types.js";
+import type { Payload } from "../types.js";
 
 import express from "express";
 import User from "../models/User.js";
 import generateToken from "../lib/generateToken.js";
 import dotenv from "dotenv";
+import { jwtVerify } from "jose";
+import JWT_SECRET from "../lib/getJWT.js";
 
 dotenv.config();
 const router = express.Router();
@@ -86,11 +88,11 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     try {
-      if(!email.trim() || !password.trim()){
+      if (!email.trim() || !password.trim()) {
         res.status(400);
-        throw new Error("Email and Password are required.")
+        throw new Error("Email and Password are required.");
       }
-      const existingUser = await User.findOne({ email: email.trim() }) as IUser|null;
+      const existingUser = await User.findOne({ email: email.trim() });
       if (!existingUser) {
         res.status(401);
         throw new Error("Invalid email or password.");
@@ -120,9 +122,46 @@ router.post(
           userId: existingUser._id,
           name: existingUser.name,
           email,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+//--------------------------------------------------------------------------------------------------------------------------------------
+//@route               POST /api/auth/refresh
+//@description         Generate new access token
+//@access              Public (Needs valid refresh token in cookie )
+router.post(
+  "/refresh",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token: string | null = req.cookies?.refreshToken;
+      if (!token) {
+        res.status(401);
+        throw new Error("No Refresh Token");
+      }
+      console.log("⏳ Refreshing Token...")
 
-        }
-      })
+      const { payload } = await jwtVerify<Payload>(token, JWT_SECRET);
+      const { userId } = payload;
+      const user = await User.findById(userId);
+      if (!user) {
+        res.status(401);
+        throw new Error("No User Found");
+      }
+
+      //generate access Token
+      const newAccessToken = await generateToken(payload, "1m");
+      res.json({
+        accessToken: newAccessToken,
+        user: {
+          userId: user._id,
+          name: user.name,
+          email: user.email,
+        },
+      });
     } catch (error) {
       next(error);
     }

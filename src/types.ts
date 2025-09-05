@@ -21,3 +21,7 @@ export interface IUser extends mongoose.Document{
   _id: mongoose.Schema.Types.ObjectId
   matchPassword: (enteredPass: string)=> Promise<boolean>
 }
+
+export type Payload = {
+  userId: string;
+};
