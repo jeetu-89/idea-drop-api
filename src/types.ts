@@ -14,14 +14,19 @@ export type UserType = {
   password: string;
 };
 
-export interface IUser extends mongoose.Document{
-  name: string,
-  email: string,
-  password: string,
-  _id: mongoose.Schema.Types.ObjectId
-  matchPassword: (enteredPass: string)=> Promise<boolean>
+export interface IUser extends mongoose.Document {
+  name: string;
+  email: string;
+  password: string;
+  _id: mongoose.Schema.Types.ObjectId;
+  matchPassword: (enteredPass: string) => Promise<boolean>;
 }
 
 export type Payload = {
   userId: string;
+};
+export type UserRequestType = {
+  _id: mongoose.Schema.Types.ObjectId;
+  name: string;
+  email: string;
 };

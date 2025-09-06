@@ -3,6 +3,7 @@ import type { Response, Request, NextFunction } from "express";
 import mongoose from "mongoose";
 import Idea from "../models/Idea.js";
 import type { IdeaBody } from "../types.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express();
 
@@ -55,6 +56,7 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 //@access              Private
 router.post(
   "/",
+  protect,
   async (req: Request<{}, {}, IdeaBody>, res: Response, next: NextFunction) => {
     
     try {
@@ -93,6 +95,7 @@ router.post(
 //@access               Private
 router.delete(
   "/:id",
+  protect,
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     try {
@@ -124,6 +127,7 @@ router.delete(
 //@access               Private
 router.put(
   "/:id",
+  protect,
   async (
     req: Request<{ id: string }, {}, IdeaBody>,
     res: Response,
