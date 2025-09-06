@@ -44,7 +44,7 @@ router.post(
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 30 * 24 * 60 * 60 * 1000, //30days
-        sameSite: "none",
+        sameSite: process.env.NODE_ENV === 'production' ? 'none': 'lax',
         secure: process.env.NODE_ENV === "production",
       });
 
@@ -71,7 +71,7 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
       secure: process.env.NODE_ENV === "production",
     });
     res.status(200).json({
@@ -113,7 +113,7 @@ router.post(
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 30 * 24 * 60 * 60 * 1000, //30days,
-        sameSite: "none",
+        sameSite: process.env.NODE_ENV === "production"? 'none'  : 'lax',
         secure: process.env.NODE_ENV === "production",
       });
 
