@@ -58,7 +58,6 @@ router.post(
   "/",
   protect,
   async (req: Request<{}, {}, IdeaBody>, res: Response, next: NextFunction) => {
-    
     try {
       const { title, summary, description, tags } = req.body || {};
       if (!title.trim() || !summary.trim() || !description.trim()) {
@@ -78,6 +77,7 @@ router.post(
             : Array.isArray(tags)
             ? tags
             : [],
+        user: req.user?._id,
       };
 
       const savedIdea = await Idea.create(newIdea);
@@ -107,12 +107,19 @@ router.delete(
         res.status(400);
         throw new Error("Invalid idea id has provided.");
       }
-      const idea = await Idea.findByIdAndDelete(id);
+      const idea = await Idea.findById(id);
 
       if (!idea) {
         res.status(404);
         throw new Error("Idea not Found");
       }
+
+      if (idea.user.toString() !== req.user?._id.toString()) {
+        res.status(403);
+        throw new Error("Not authorized to delete this idea");
+      }
+
+      await Idea.deleteOne({ _id: id });
       res.json({
         message: "Idea deleted successfully",
       });
@@ -122,7 +129,7 @@ router.delete(
   }
 );
 //-----------------------------------------------------------------------------------------------------------------
-//@routes               Update /api/ideas/:id
+//@routes               PUT /api/ideas/:id
 //@description          Update single idea by its id
 //@access               Private
 router.put(
@@ -135,6 +142,17 @@ router.put(
   ) => {
     const { id } = req.params;
     try {
+      const idea = await Idea.findById(id);
+      if (!idea) {
+        res.status(404);
+        throw new Error("Idea not Found");
+      }
+
+      if (idea.user.toString() !== req.user?._id.toString()) {
+        res.status(403);
+        throw new Error("Not authorized to update this idea.");
+      }
+
       const { title, description, summary, tags } = req.body || {};
       if (!id) {
         res.status(400);
@@ -149,26 +167,21 @@ router.put(
         throw new Error("Title, Description, and Summary are needed");
       }
 
-      const newIdea = {
-        title,
-        description,
-        summary,
-        tags:
-          typeof tags === "string"
-            ? tags
-                .split(",")
-                .map((tag) => tag.trim())
-                .filter(Boolean)
-            : Array.isArray(tags)
-            ? tags
-            : [],
-      };
-      const savedIdea = await Idea.findByIdAndUpdate(id, newIdea);
-      if (!savedIdea) {
-        res.status(404);
-        throw new Error("Idea not Found");
-      }
-      res.status(201).json(savedIdea);
+      //updation
+      idea.title = title.trim();
+      idea.description = description.trim();
+      idea.summary = summary.trim();
+      idea.tags =
+        typeof tags === "string"
+          ? tags
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean)
+          : Array.isArray(tags)
+          ? tags
+          : [];
+      const updatedIdea = await idea.save();
+      res.status(201).json(updatedIdea);
     } catch (error) {
       next(error);
     }
