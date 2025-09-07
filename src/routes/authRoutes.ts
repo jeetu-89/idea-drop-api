@@ -120,7 +120,7 @@ router.post(
       res.status(200).json({
         accessToken,
         user: {
-          userId: existingUser._id,
+          id : existingUser._id,
           name: existingUser.name,
           email,
         },
@@ -159,7 +159,7 @@ router.post(
       res.json({
         accessToken: newAccessToken,
         user: {
-          userId: user._id,
+          id : user._id,
           name: user.name,
           email: user.email,
         },
