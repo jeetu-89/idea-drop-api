@@ -14,7 +14,10 @@ const PORT = process.env.PORT || 8000;
 
 connectDB();
 
-const allowedOrigins = ["http://localhost:3000", "https://idea-drop-ui-kappa.vercel.app/"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://idea-drop-ui-kappa.vercel.app",
+];
 //Middleware
 app.use(
   cors({
