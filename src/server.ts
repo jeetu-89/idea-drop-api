@@ -16,7 +16,7 @@ connectDB();
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://idea-drop-ui-kappa.vercel.app",
+  "idea-drop-ui-snowy.vercel.app",
 ];
 //Middleware
 app.use(
